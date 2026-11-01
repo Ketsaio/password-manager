@@ -1,17 +1,17 @@
 import subprocess
 import json
 
-def names():
+def get_usb_mounts():
 
     mount_list = []
 
-    # wywołanie komendy listującej zamontowane dyski, zwraca sie w formacie jsona
+    # command returns data about all mounted drives in json format
     x = subprocess.run(["lsblk", "-J", "-o", "NAME,TRAN,RM,MOUNTPOINTS,TYPE"], capture_output=True, text=True)
 
-    y = json.loads(x.stdout).get('blockdevices')    # wyciąga potrzebną nam liste mount-ów
+    y = json.loads(x.stdout).get('blockdevices')    # returns parsed mounts list
 
     for elem in y:
-        if elem.get("tran") == "usb":   # sprawdza czy mount jest pendrive-m
+        if elem.get("tran") == "usb":   # checks if mount is USB
 
             iterate_mountpoints(elem, mount_list)
 
@@ -23,19 +23,16 @@ def iterate_mountpoints(elem, mount_list):
 
     if elem.get("children"):
 
-        for child in elem.get("children"):      # jeżeli urządzenie posiada dzieci to wchodzimy głębiej w rekurencje
+        for child in elem.get("children"):      # checks for children in device, if present goes into recursion
             iterate_mountpoints(child, mount_list)
 
 
     for mount in elem.get("mountpoints") or []:
 
-        if mount is not None:                   # itreuje po zamontowanych partycjach (pendrive-a/dziecka)
+        if mount is not None:                   # itreates through mounted partitions (USB/child)
 
             mount_list.append(mount)
 
             
-
-
-
-
-# print(names())
+if __name__ == "__main__":
+    print(get_usb_mounts())
