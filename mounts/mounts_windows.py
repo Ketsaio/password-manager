@@ -28,4 +28,4 @@ def get_usb_mounts():
 
 
 if __name__ == "__main__":
-    get_usb_mounts()
+    print(get_usb_mounts())
